@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="PhotocopyProxy/PhotocopyProxy.csproj" />
+  <Project Path="PhotocopySystem.csproj" />
+</Solution>
