@@ -8,30 +8,26 @@ namespace PhotocopyProxy
     {
         public string Host { get; }
         public int Port { get; }
-        public int healthCheckPort { get; }
-        public bool isHealthy { get; set; }
-        public double weight { get; set; } = 1.0; // Default weight for load balancing
-        public ServerInfo(string host, int port, int healthCheckPort)
-        {
-            Host = host;
-            Port = port;
-            this.healthCheckPort = healthCheckPort;
-            isHealthy = true; // Assume server is healthy at initialization
-        }
+        public int HealthCheckPort { get; }
+        public bool IsHealthy { get; set; }
 
-        public ServerInfo(string host, int port, int healthCheckPort, double weight)
+        public double Weight { get; set; } = 1.0;
+
+        // For advanced WRR (smooth algorithm)
+        public double CurrentWeight { get; set; } = 0;
+
+        public ServerInfo(string host, int port, int healthCheckPort, double weight = 1.0)
         {
             Host = host;
             Port = port;
-            this.healthCheckPort = healthCheckPort;
-            isHealthy = true; // Assume server is healthy at initialization
-            this.weight = weight;
+            HealthCheckPort = healthCheckPort;
+            Weight = weight;
+            IsHealthy = true;
         }
 
         public override string ToString()
         {
-            return $"{Host}:{Port} (Health Check Port: {healthCheckPort}, Healthy: {isHealthy}, Weight: {weight})";
+            return $"{Host}:{Port} | Healthy: {IsHealthy} | Weight: {Weight}";
         }
-
     }
 }
