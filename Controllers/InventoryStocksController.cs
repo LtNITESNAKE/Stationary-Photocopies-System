@@ -88,6 +88,9 @@ public async Task<IActionResult> Edit(int id, [Bind("Id,ProductId,QuantityAvaila
         }
     }
 
+    // FIX: Re-load the Product data so the View doesn't crash when trying to display @Model.Product.Name
+    stock.Product = await _context.Products.FindAsync(stock.ProductId);
+    
     return View(stock);
 }
 }
