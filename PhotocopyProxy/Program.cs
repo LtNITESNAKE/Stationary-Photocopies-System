@@ -1,1 +1,10 @@
-﻿Console.WriteLine("Hello, World!");
+namespace PhotocopyProxy
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Hello, World!");
+        }
+    }
+}

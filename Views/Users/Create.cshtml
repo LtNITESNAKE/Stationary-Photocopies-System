@@ -1,0 +1,101 @@
+@* Create.cshtml File (Users)*@
+@model PhotocopySystem.Models.User
+
+@{
+    ViewData["Title"] = "Create User";
+}
+
+<!-- GOLDEN EXAMPLE (By Mujtaba) -->
+<!-- Team, this is how you build a beautiful, responsive Form! -->
+
+<div class="container mt-5 mb-5 d-flex justify-content-center">
+    <div class="card shadow-lg border-0" style="border-radius: 20px; width: 100%; max-width: 600px;">
+        
+        <!-- Header Section -->
+        <div class="card-header text-center text-white py-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-top-left-radius: 20px; border-top-right-radius: 20px;">
+            <h3 class="mb-0 fw-bold">Create New User</h3>
+            <p class="mb-0 text-white-50 small">Fill out the form below to register a new account.</p>
+        </div>
+
+        <div class="card-body p-5 bg-white">
+            <!-- 1. The asp-action tells it to send the data to the Create POST method in UsersController -->
+            <form asp-action="Create" method="post">
+                <!-- 2. This shows summary errors if ModelState.IsValid fails -->
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <!-- Input Field: Full Name -->
+                <div class="form-floating mb-4">
+                    <input asp-for="FullName" class="form-control custom-input" placeholder="John Doe" />
+                    <label asp-for="FullName" class="text-muted">Full Name</label>
+                    <span asp-validation-for="FullName" class="text-danger small mt-1 d-block"></span>
+                </div>
+
+                <!-- Input Field: Email -->
+                <div class="form-floating mb-4">
+                    <input asp-for="Email" type="email" class="form-control custom-input" placeholder="name@example.com" />
+                    <label asp-for="Email" class="text-muted">Email Address</label>
+                    <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
+                </div>
+
+                <!-- Input Field: Password -->
+                <div class="form-floating mb-4">
+                    <input asp-for="PasswordHash" type="password" class="form-control custom-input" placeholder="Password" />
+                    <label asp-for="PasswordHash" class="text-muted">Password</label>
+                    <span asp-validation-for="PasswordHash" class="text-danger small mt-1 d-block"></span>
+                </div>
+
+                <!-- Dropdown: Role -->
+                <div class="form-floating mb-4">
+                    <select asp-for="Role" class="form-select custom-input">
+                        <option value="Student">Student</option>
+                        <option value="Teacher">Teacher</option>
+                        <option value="Operator">Photocopier Operator</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                    <label asp-for="Role" class="text-muted">Account Role</label>
+                    <span asp-validation-for="Role" class="text-danger small mt-1 d-block"></span>
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-between align-items-center mt-5">
+                    <a asp-action="Index" class="btn btn-light rounded-pill px-4 py-2 fw-semibold text-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Back to List
+                    </a>
+                    <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow-sm custom-btn">
+                        Create User <i class="bi bi-check2 me-1"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Premium Form Styling */
+    .custom-input {
+        border-radius: 12px;
+        border: 1px solid #e0e0e0;
+        background-color: #fcfcfc;
+        transition: all 0.3s ease;
+    }
+    .custom-input:focus {
+        border-color: #764ba2;
+        box-shadow: 0 0 0 4px rgba(118, 75, 162, 0.1);
+        background-color: #ffffff;
+    }
+    .custom-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .custom-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4) !important;
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+</style>
+
+<!-- 3. This script enables client-side validation (instant red text if they leave a field empty) -->
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
