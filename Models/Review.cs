@@ -24,6 +24,9 @@ namespace PhotocopySystem.Models
         [ForeignKey("ProductId")]
         public virtual Product Product { get; set; }
 
-        // Your turn! Add Rating (int), Comment (string), CreatedAt (DateTime)
+        // FIX: Added the missing properties!
+        public int Rating { get; set; }
+        public string Comment { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

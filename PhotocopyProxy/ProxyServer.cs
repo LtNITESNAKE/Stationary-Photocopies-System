@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -96,12 +96,9 @@ namespace PhotocopyProxy
                         // Send request to backend
                         await backendStream.WriteAsync(data, 0, data.Length);
 
-                        // Receive response
-                        byte[] responseBuffer = new byte[4096];
-                        int responseBytes = await backendStream.ReadAsync(responseBuffer, 0, responseBuffer.Length);
-
-                        // Send response back to client
-                        await clientStream.WriteAsync(responseBuffer, 0, responseBytes);
+                        // Receive response and stream it fully back to the client
+                        // FIX: We use CopyToAsync here so it reads until the backend closes the stream, supporting websites > 4KB!
+                        await backendStream.CopyToAsync(clientStream);
 
                         return; // success
                     }
