@@ -1,0 +1,285 @@
+@{
+    ViewData["Title"] = "Upload Notes";
+    
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] – Teacher Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+    <style>
+        :root {
+            --primary:   #1a56db;
+            --primary-dk:#1340a8;
+            --success:   #0e9f6e;
+            --bg:        #f0f4ff;
+            --card-bg:   #ffffff;
+            --border:    #dde3f0;
+            --text:      #1e2a46;
+            --muted:     #6b7a99;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+        }
+
+        /* ── Top Bar ── */
+        .top-bar {
+            background: var(--primary);
+            color: #fff;
+            padding: 0.85rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 2px 8px rgba(26,86,219,.35);
+        }
+        .top-bar .brand { font-size: 1.25rem; font-weight: 700; letter-spacing: .5px; }
+        .top-bar .sub   { font-size: .85rem; opacity: .82; margin-left: auto; }
+
+        /* ── Upload card ── */
+        .upload-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(26,86,219,.08);
+            padding: 2rem 2.25rem;
+        }
+        .upload-card h4 {
+            font-weight: 700;
+            font-size: 1.15rem;
+            display: flex;
+            align-items: center;
+            gap: .55rem;
+            margin-bottom: 1.5rem;
+        }
+        .upload-card h4 .bi { color: var(--primary); font-size: 1.3rem; }
+
+        .form-label { font-weight: 600; font-size: .88rem; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+            padding: .6rem .9rem;
+            font-size: .95rem;
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26,86,219,.15);
+        }
+
+        /* file input styling */
+        input[type="file"].form-control { padding: .45rem .9rem; }
+
+        .btn-upload {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: .65rem 2rem;
+            font-weight: 600;
+            font-size: .95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            transition: background .2s, transform .15s;
+        }
+        .btn-upload:hover { background: var(--primary-dk); transform: translateY(-1px); }
+
+        /* ── Success alert ── */
+        .alert-success-custom {
+            background: #d1fae5;
+            border: 1.5px solid #6ee7b7;
+            color: #065f46;
+            border-radius: 10px;
+            padding: .85rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            font-weight: 600;
+            animation: fadeIn .4s ease;
+        }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+
+        /* ── Notes table ── */
+        .notes-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(26,86,219,.06);
+            padding: 1.75rem 2.25rem;
+        }
+        .notes-card h4 {
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            margin-bottom: 1.25rem;
+        }
+        .notes-card h4 .bi { color: var(--primary); }
+
+        .table thead th {
+            background: #eef2ff;
+            color: var(--muted);
+            font-size: .8rem;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            border-bottom: 2px solid var(--border);
+            font-weight: 600;
+        }
+        .table tbody tr:hover { background: #f5f7ff; }
+        .table td { vertical-align: middle; font-size: .93rem; }
+
+        .badge-subject {
+            background: #e0e7ff;
+            color: #3730a3;
+            border-radius: 6px;
+            padding: .3em .7em;
+            font-size: .8rem;
+            font-weight: 600;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: var(--muted);
+        }
+        .empty-state .bi { font-size: 2.5rem; opacity: .4; display: block; margin-bottom: .5rem; }
+    </style>
+</head>
+<body>
+
+    <!-- Top navigation bar -->
+    <div class="top-bar">
+        <i class="bi bi-journal-text fs-4"></i>
+        <span class="brand">Stationary-Photocopies-System</span>
+        <span class="sub">
+            <i class="bi bi-person-circle me-1"></i>
+            @(User?.Identity?.Name ?? "Teacher")
+        </span>
+    </div>
+
+    <div class="container py-4" style="max-width:860px;">
+
+        
+        @if (TempData["UploadSuccess"] != null && (bool)TempData["UploadSuccess"])
+        {
+            <div class="alert-success-custom mb-4">
+                <i class="bi bi-check-circle-fill fs-5"></i>
+                Your notes were uploaded successfully!
+            </div>
+        }
+
+        
+        <div class="upload-card mb-4">
+            <h4><i class="bi bi-cloud-arrow-up"></i> Upload Notes</h4>
+
+            <form method="post"
+                  asp-controller="Teacher"
+                  asp-action="Upload"
+                  enctype="multipart/form-data">
+
+                @Html.AntiForgeryToken()
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Subject</label>
+                        <input type="text"
+                               name="Subject"
+                               class="form-control"
+                               placeholder="e.g. Database Systems"
+                               required />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Note Title</label>
+                        <input type="text"
+                               name="Title"
+                               class="form-control"
+                               placeholder="e.g. Chapter 3 – Normalization"
+                               required />
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Attach File <span style="color:#6b7a99;font-size:.8rem;">(PDF, DOC, DOCX, PPT)</span></label>
+                        <input type="file"
+                               name="NoteFile"
+                               class="form-control"
+                               accept=".pdf,.doc,.docx,.ppt,.pptx"
+                               required />
+                    </div>
+
+                    <div class="col-12 pt-1">
+                        <button type="submit" class="btn-upload">
+                            <i class="bi bi-upload"></i> Upload Now
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        
+        <div class="notes-card">
+            <h4><i class="bi bi-files"></i> Your Uploaded Notes</h4>
+
+            @{
+                // ── DUMMY DATA – remove once you wire the real model ──
+                var dummyNotes = new[]
+                {
+                    new { Title="Chapter 1 – Intro to DBMS",     Subject="Database Systems",    Date="2025-06-01" },
+                    new { Title="Networking OSI Model",           Subject="Computer Networks",   Date="2025-06-03" },
+                    new { Title="Recursion & Stack Overflow",     Subject="Data Structures",     Date="2025-06-07" },
+                };
+            }
+
+            @if (!dummyNotes.Any())   @* replace dummyNotes with Model *@
+            {
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    No notes uploaded yet. Use the form above to add your first one.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Title</th>
+                                <th>Subject</th>
+                                <th>Date Uploaded</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{int i = 1;}
+                            @foreach (var note in dummyNotes)   @* replace with Model *@
+                            {
+                                <tr>
+                                    <td class="text-muted">@i</td>
+                                    <td>
+                                        <i class="bi bi-file-earmark-text text-primary me-2"></i>
+                                        @note.Title
+                                    </td>
+                                    <td><span class="badge-subject">@note.Subject</span></td>
+                                    <td class="text-muted">@note.Date</td>
+                                </tr>
+                                i++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+    </div><!-- /container -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
