@@ -23,9 +23,10 @@ namespace PhotocopySystem.Models
         public virtual Product Product { get; set; }
 
         // Now your turn! Add 'QuantityAvailable' (int)
+         public int QuantityAvailable { get; set; }
         
         // IMPORTANT FOR CONCURRENCY:
-        // [Timestamp]
-        // public byte[] RowVersion { get; set; }
+         [Timestamp]
+         public byte[] RowVersion { get; set; }
     }
 }
