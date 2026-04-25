@@ -14,27 +14,9 @@ namespace PhotocopySystem.Models
         // 4. Add Quantity and UnitPrice.
 
         // EXAMPLE PROPERTIES:
-        //1:
         [Key]
         public int Id { get; set; }
 
-        // 2. 
-        [ForeignKey("Order")]
-        public int OrderId { get; set; }
-        public virtual Order Order { get; set; }
-
-        // 3.
-        [ForeignKey("Product")]
-        public int ProductId { get; set; }
-        public virtual Product Product { get; set; }
-
-        // 4.
-        [Required]
-        public int Quantity { get; set; }
-
-        [Required]
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal UnitPrice { get; set; }
-
+       
     }
 }

@@ -24,47 +24,16 @@ namespace PhotocopySystem.Controllers
         {
             // TODO: Once you finish the OrderItem Model, uncomment these .Include lines!
             var orderItems = _context.OrderItems
-                .Include(o => o.Order)
-                .Include(o => o.Product)
+                /*.Include(o => o.Order)*/
+                /*.Include(o => o.Product)*/
                 .ToList();
             return View(orderItems);
         }
 
         // 2. AddToCart(int productId, int quantity) - POST
         // TODO: Find the Student's active 'Cart' Order. Create an OrderItem linking the Product to the Order.
-        public IActionResult AddToCart(int productId, int quantity)
-        {
-            var cartOrder = _context.Orders.FirstOrDefault(o => o.Status == "Cart");
-            var product = _context.Products.Find(productId);
-            if (cartOrder != null)
-            {
-                var newItem = new OrderItem
-                {
-                    OrderId = cartOrder.Id,
-                    ProductId = productId,
-                    Quantity = quantity,
-                   // UnitPrice = product.Price
-
-                };
-
-                _context.OrderItems.Add(newItem);
-                _context.SaveChanges();
-            }
-
-            return RedirectToAction("Index");
-        }
 
         // 3. RemoveFromCart(int id) - POST
         // TODO: Delete the OrderItem from the database.
-        public IActionResult RemoveFromCart(int id)
-        {
-            var item = _context.OrderItems.Find(id);
-            if (item != null)
-            {
-                _context.OrderItems.Remove(item);
-                _context.SaveChanges();
-            }
-            return RedirectToAction("Index");
-        }
     }
 }

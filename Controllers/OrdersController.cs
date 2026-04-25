@@ -24,27 +24,12 @@ namespace PhotocopySystem.Controllers
         {
             // TODO: Once you finish the Order Model, uncomment the .Include() line!
             var orders = _context.Orders
-                .Include(o => o.User) // The Student
+                /*.Include(o => o.User)*/ // The Student
                 .ToList();
             return View(orders);
         }
 
         // 2. Details(int id) - GET
         // TODO: Fetch the order and .Include(o => o.OrderItems).ThenInclude(i => i.Product) to show what they bought.
-        public IActionResult Details(int id)
-        {
-            var order = _context.Orders
-                .Include(o => o.User)
-                .Include(o => o.OrderItems)
-                    .ThenInclude(i => i.Product)
-                .FirstOrDefault(o => o.Id == id);
-
-            if (order == null)
-            {
-                return NotFound();
-            }
-
-            return View(order);
-        }
     }
 }

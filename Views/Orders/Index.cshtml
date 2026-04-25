@@ -4,67 +4,12 @@
     ViewData["Title"] = "All Orders";
 }
 
+<!-- TODO for Malaika (Student Orders Dashboard): -->
+<!-- 1. Use the Users/Index.cshtml template. -->
+<!-- 2. Display User.FullName (The Student!), OrderDate, TotalAmount, Status. -->
+
 <div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold" style="color: #2c3e50;">
-            <i class="bi bi-receipt me-2"></i>Customer Orders
-        </h2>
-    </div>
-
-    <div class="card shadow-lg border-0" style="border-radius: 15px; overflow: hidden;">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0 align-middle">
-                    <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                        <tr>
-                            <th class="py-3 px-4">ID</th>
-                            <th class="py-3 px-4">Full Name</th>
-                            <th class="py-3 px-4">Order Date</th>
-                            <th class="py-3 px-4">Total Amount</th>
-                            <th class="py-3 px-4">Status</th>
-                            <th class="py-3 px-4 text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                            <tr>
-                                <td class="px-4 fw-bold text-muted">#@item.Id</td>
-                                <td class="px-4 fw-semibold text-dark">@item.User?.FullName</td>
-                                <td class="px-4 text-muted">@item.OrderDate.ToString("yyyy-MM-dd")</td>
-                                <td class="px-4 text-muted">@item.TotalAmount</td>
-                                <td class="px-4">
-                                    <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">@item.Status</span>
-                                </td>
-                                <td class="px-4 text-center">
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary rounded-circle">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+    <h2><i class="bi bi-receipt"></i> Customer Orders</h2>
+    <hr />
+    <p class="text-muted">Malaika, build your master order list here!</p>
 </div>
-
-<style>
-    .table-hover tbody tr:hover {
-        background-color: #f8f9fa;
-        transform: translateY(-1px);
-        transition: all 0.2s ease;
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-    }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
-        }
-</style>
