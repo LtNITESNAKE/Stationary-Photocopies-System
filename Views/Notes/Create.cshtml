@@ -1,0 +1,51 @@
+@model PhotocopySystem.Models.Note
+
+@{
+    ViewData["Title"] = "Upload Teacher Note";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white py-3">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-cloud-arrow-up me-2"></i>Teacher Note Upload</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Select Subject</label>
+                            <select asp-for="SubjectId" class="form-select" asp-items="ViewBag.Subjects">
+                                <option value="">-- Select Subject --</option>
+                            </select>
+                            <span asp-validation-for="SubjectId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label fw-bold">Note/Assignment Title</label>
+                            <input asp-for="Title" class="form-control" placeholder="e.g. Week 4: Thread Synchronization" />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Version" class="form-label fw-bold">Version Number</label>
+                            <input asp-for="Version" class="form-control" placeholder="e.g. 1.0" />
+                            <span asp-validation-for="Version" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-success py-2 fw-bold">Upload & Publish</button>
+                            <a asp-action="Index" class="btn btn-link text-muted small">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

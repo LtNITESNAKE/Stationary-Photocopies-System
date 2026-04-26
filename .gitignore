@@ -480,3 +480,18 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Documentation and Markdown
+Documentation/
+*.md
+!README.md
+
+#ignore user guide
+PhotocopySystem_ActualGuide.md
+
+# Ignore publish zip
+publish.zip
+
+# Ignore appsettings containing sensitive connection strings
+appsettings.json
+appsettings.*.json

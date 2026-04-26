@@ -1,7 +1,7 @@
 @model PhotocopySystem.Models.Product
 
 @{
-    ViewData["Title"] = "Add New Product";
+    ViewData["Title"] = "Edit Product";
 }
 
 <div class="container mt-5">
@@ -9,21 +9,22 @@
         <div class="col-md-6">
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-primary text-white py-3">
-                    <h4 class="mb-0 fw-bold"><i class="bi bi-cart-plus me-2"></i>New Product</h4>
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-pencil me-2"></i>Edit Product</h4>
                 </div>
                 <div class="card-body p-4">
-                    <form asp-action="Create">
+                    <form asp-action="Edit">
+                        <input type="hidden" asp-for="Id" />
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                         
                         <div class="mb-3">
                             <label asp-for="Name" class="form-label fw-bold">Product Name</label>
-                            <input asp-for="Name" class="form-control" placeholder="e.g. Ballpoint Pen" />
+                            <input asp-for="Name" class="form-control" />
                             <span asp-validation-for="Name" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
                             <label asp-for="Price" class="form-label fw-bold">Price (PKR)</label>
-                            <input asp-for="Price" class="form-control" placeholder="e.g. 25.00" />
+                            <input asp-for="Price" class="form-control" />
                             <span asp-validation-for="Price" class="text-danger small"></span>
                         </div>
 
@@ -37,10 +38,10 @@
 
                         <div class="d-flex justify-content-between align-items-center">
                             <a asp-action="Index" class="text-muted text-decoration-none">
-                                <i class="bi bi-arrow-left me-1"></i> Cancel
+                                <i class="bi bi-arrow-left me-1"></i> Back to List
                             </a>
                             <button type="submit" class="btn btn-primary px-4 py-2 fw-bold rounded-pill">
-                                Save Product
+                                Save Changes
                             </button>
                         </div>
                     </form>

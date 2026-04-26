@@ -1,47 +1,107 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - PhotocopySystem</title>
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] - Photocopy Portal</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/PhotocopySystem.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">PhotocopySystem</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div id="wrapper">
+            <!-- Professional Sidebar -->
+            <nav id="sidebar">
+                <div class="sidebar-header text-center">
+                    <h5 class="mb-0 fw-bold text-primary">Photocopy System</h5>
+                    <div class="small text-muted mt-1">University Portal</div>
+                </div>
+
+                <ul class="list-unstyled components">
+                    <p class="nav-label">Main Services</p>
+                    <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")">
+                        <a asp-controller="Home" asp-action="Index"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
+                    </li>
+                    <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "PrintJobs" ? "active" : "")">
+                        <a asp-controller="PrintJobs" asp-action="Index"><i class="bi bi-printer me-2"></i>Printing Queue</a>
+                    </li>
+                    <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Notes" ? "active" : "")">
+                        <a asp-controller="Notes" asp-action="Index"><i class="bi bi-file-earmark-text me-2"></i>Notes Library</a>
+                    </li>
+
+                    @if (User.IsInRole("Student") || User.IsInRole("Admin"))
+                    {
+                        <p class="nav-label">Stationery Shop</p>
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "InventoryStocks" ? "active" : "")">
+                            <a asp-controller="InventoryStocks" asp-action="Index"><i class="bi bi-shop me-2"></i>Items & Stock</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Orders" ? "active" : "")">
+                            <a asp-controller="Orders" asp-action="Index"><i class="bi bi-bag-check me-2"></i>Recent Orders</a>
                         </li>
-                    </ul>
+                    }
+
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <p class="nav-label text-danger">Management</p>
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Users" ? "active" : "")">
+                            <a asp-controller="Users" asp-action="Index"><i class="bi bi-people me-2"></i>Member Management</a>
+                        </li>
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Subjects" ? "active" : "")">
+                            <a asp-controller="Subjects" asp-action="Index"><i class="bi bi-book me-2"></i>Course Subjects</a>
+                        </li>
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Categories" ? "active" : "")">
+                            <a asp-controller="Categories" asp-action="Index"><i class="bi bi-tags me-2"></i>Categories</a>
+                        </li>
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Products" ? "active" : "")">
+                            <a asp-controller="Products" asp-action="Index"><i class="bi bi-box-seam me-2"></i>Products</a>
+                        </li>
+                    }
+
+                    @if (User.IsInRole("Teacher"))
+                    {
+                        <p class="nav-label text-success">Teacher Tools</p>
+                        <li><a asp-controller="Notes" asp-action="Create"><i class="bi bi-cloud-upload me-2"></i>Upload New Note</a></li>
+                    }
+                </ul>
+
+                <div class="p-4 mt-auto">
+                    <hr class="border-secondary">
+                    <div class="small mb-1 text-muted">Signed in as:</div>
+                    <div class="fw-bold small text-truncate text-white">@User.Identity.Name</div>
+                    <a asp-controller="Users" asp-action="Logout" class="btn btn-sm btn-danger w-100 mt-3 rounded-pill shadow-sm">Logout</a>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <div id="content">
+                <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom mb-4 shadow-sm">
+                    <div class="container-fluid">
+                        <span class="navbar-text fw-bold text-dark fs-5">
+                             @ViewData["Title"]
+                        </span>
+                        <div class="ms-auto text-muted small d-none d-md-block">
+                             <i class="bi bi-person-circle me-1"></i> System Role: <strong>@User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value</strong>
+                        </div>
+                    </div>
+                </nav>
+                <div class="container-fluid">
+                    @RenderBody()
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - PhotocopySystem - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
-    </footer>
+    }
+    else
+    {
+        <div class="auth-wrapper bg-light">
+            <div class="container py-5">
+                @RenderBody()
+            </div>
+        </div>
+    }
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

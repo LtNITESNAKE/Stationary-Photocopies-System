@@ -1,80 +1,60 @@
-@* Index.cshtml File (Users)*@
 @model IEnumerable<PhotocopySystem.Models.User>
 
 @{
-    ViewData["Title"] = "User Management";
+    ViewData["Title"] = "Member Management";
 }
 
-<!-- GOLDEN EXAMPLE (By Mujtaba) -->
-<!-- Team, this is how you build a premium list/table view for your entities! -->
-
-<div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold" style="color: #2c3e50;">
-            <i class="bi bi-people-fill me-2"></i>User Management
-        </h2>
-        <!-- 1. The button to go to the Create form -->
-        <a asp-action="Create" class="btn btn-primary shadow-sm rounded-pill px-4 py-2">
-            <i class="bi bi-plus-lg me-1"></i> Add New User
-        </a>
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="fw-bold text-secondary"><i class="bi bi-people me-2"></i>University Members</h2>
+            <p class="text-muted">Admin: Manage roles and accounts for all team members.</p>
+        </div>
+        <div class="col text-end">
+            <a asp-action="Create" class="btn btn-dark fw-bold">
+                <i class="bi bi-person-plus me-2"></i>Create User
+            </a>
+        </div>
     </div>
 
-    <div class="card shadow-lg border-0" style="border-radius: 15px; overflow: hidden;">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-1"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover mb-0 align-middle">
-                    <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
                         <tr>
-                            <th class="py-3 px-4">ID</th>
-                            <th class="py-3 px-4">Full Name</th>
-                            <th class="py-3 px-4">Email</th>
-                            <th class="py-3 px-4">Role</th>
-                            <th class="py-3 px-4">Created Date</th>
-                            <th class="py-3 px-4 text-center">Actions</th>
+                            <th class="ps-4 py-3">Full Name</th>
+                            <th class="py-3">Email Address</th>
+                            <th class="py-3">System Role</th>
+                            <th class="py-3">Join Date</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- 2. Normally, we would loop through @Model here. 
-                             For now, I put a dummy row so you can see the styling. -->
-                        <tr>
-                            <td class="px-4 fw-bold text-muted">#1</td>
-                            <td class="px-4 fw-semibold text-dark">Mujtaba Architect</td>
-                            <td class="px-4 text-muted">admin@photocopy.com</td>
-                            <td class="px-4">
-                                <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">Admin</span>
-                            </td>
-                            <td class="px-4 text-muted">2026-04-24</td>
-                            <td class="px-4 text-center">
-                                <!-- Example Action Buttons -->
-                                <button class="btn btn-sm btn-outline-primary rounded-circle me-1" title="Edit">
-                                    <i class="bi bi-pencil"></i> E
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger rounded-circle" title="Delete">
-                                    <i class="bi bi-trash"></i> D
-                                </button>
-                            </td>
-                        </tr>
+                        @foreach (var item in Model)
+                        {
+                            <tr class="align-middle">
+                                <td class="ps-4 fw-bold">@item.FullName</td>
+                                <td>@item.Email</td>
+                                <td>
+                                    @{
+                                        var roleBadge = item.Role == "Admin" ? "bg-danger" : (item.Role == "Teacher" ? "bg-success" : "bg-primary");
+                                    }
+                                    <span class="badge @roleBadge">@item.Role</span>
+                                </td>
+                                <td>@item.CreatedAt.ToShortDateString()</td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    /* Premium Hover Effects */
-    .table-hover tbody tr:hover {
-        background-color: #f8f9fa;
-        transform: translateY(-1px);
-        transition: all 0.2s ease;
-    }
-    .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-    }
-    .btn-primary:hover {
-        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
-    }
-</style>

@@ -1,51 +1,76 @@
 @model PhotocopySystem.Models.PrintJob
 
 @{
-    ViewData["Title"] = "Submit Print Job";
+    ViewData["Title"] = "Request Photocopies";
 }
 
-<!-- TODO for Maryam (Student Print Request Form): -->
-<!-- 1. Use the Users/Create.cshtml template. -->
-<!-- 2. Add inputs for NoteId (Dropdown), DocumentName, and Copies. -->
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-printer-fill me-2"></i>Photocopy Request Form</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
 
-<div class="container mt-5">
-    <h2><i class="bi bi-cloud-arrow-up"></i> Submit Document for Printing</h2>
-    <hr />
-    <p class="text-muted">Maryam, build your upload form here!</p>
-    <form asp-action="Create" method="post">
+                        <div class="alert alert-info py-2 small mb-4">
+                            <i class="bi bi-info-circle me-1"></i> 
+                            Please select the subject and note version. Payment details will be shown after submission.
+                        </div>
 
-        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Select Available Notes/Assignments</label>
+                            <select asp-for="NoteId" class="form-select form-select-lg">
+                                <option value="">-- Choose Subject - Teacher - Version --</option>
+                                @if (ViewBag.Notes != null)
+                                {
+                                    foreach (var note in (IEnumerable<PhotocopySystem.Models.Note>)ViewBag.Notes)
+                                    {
+                                        <option value="@note.Id">
+                                            [@note.Subject?.Name] @note.Title (By @note.Teacher?.FullName) - v@note.Version
+                                        </option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="NoteId" class="text-danger small"></span>
+                        </div>
 
-        <div class="mb-3">
-            <label class="form-label">Select Note</label>
-            <select asp-for="NoteId" class="form-control">
-                <option value="">-- Select Note --</option>
-                @if (ViewBag.Notes != null)
-                {
-                    foreach (var note in (IEnumerable<PhotocopySystem.Models.Note>)ViewBag.Notes)
-                    {
-                        <option value="@note.Id">@note.Title</option>
-                    }
-                }
-            </select>
-            <span asp-validation-for="NoteId" class="text-danger"></span>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-4">
+                                    <label asp-for="DocumentName" class="form-label fw-bold">Custom Document Name (Optional)</label>
+                                    <input asp-for="DocumentName" class="form-control" placeholder="e.g. MyAssignment.pdf" />
+                                    <span asp-validation-for="DocumentName" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-4">
+                                    <label asp-for="Copies" class="form-label fw-bold">No. of Copies</label>
+                                    <input asp-for="Copies" type="number" min="1" value="1" class="form-control" />
+                                    <span asp-validation-for="Copies" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a asp-action="Index" class="text-muted text-decoration-none small">
+                                <i class="bi bi-arrow-left me-1"></i> Back to Queue
+                            </a>
+                            <button type="submit" class="btn btn-primary px-5 py-2 fw-bold rounded-pill shadow-sm">
+                                <i class="bi bi-check-circle me-2"></i> Confirm & Print
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-
-        <div class="mb-3">
-            <label asp-for="DocumentName" class="form-label"></label>
-            <input asp-for="DocumentName" class="form-control" placeholder="Enter document name" />
-            <span asp-validation-for="DocumentName" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="Copies" class="form-label"></label>
-            <input asp-for="Copies" type="number" class="form-control" placeholder="Enter number of copies" />
-            <span asp-validation-for="Copies" class="text-danger"></span>
-        </div>
-
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-printer"></i> Submit Print Job
-        </button>
-
-    </form>
+    </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

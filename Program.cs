@@ -16,7 +16,11 @@ builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.C
 
 // Register the Database context with the SQL Server connection string
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), 
+    sqlServerOptionsAction: sqlOptions => sqlOptions.EnableRetryOnFailure()));
+
+// Feature 1: Add SignalR for real-time print status updates
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -41,5 +45,7 @@ app.MapControllerRoute(
     pattern: "{controller=Users}/{action=Login}/{id?}")
     .WithStaticAssets();
 
+// Feature 1: Map SignalR hub endpoint
+app.MapHub<PhotocopySystem.Hubs.PrintStatusHub>("/printStatusHub");
 
 app.Run();

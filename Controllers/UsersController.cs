@@ -7,53 +7,43 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace PhotocopySystem.Controllers
 {
-    /// <summary>
-    /// GOLDEN EXAMPLE CONTROLLER (By Mujtaba)
-    /// This is the master example of an MVC Controller. Team, look at how the Index and Create methods are built!
-    /// </summary>
     public class UsersController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        // 1. Inject the database context so we can read/write to the SQL Server
         public UsersController(ApplicationDbContext context)
         {
             _context = context;
         }
         
-        // GET: /Users/Index
-        // This is the action that loads the main page showing all users.
-        [Authorize(Roles = "Admin,Operator")] // ONLY Admins and Operators can see this!
+        [Authorize(Roles = "Admin")]
         public IActionResult Index()
         {
-            // Fetch all users from the real database!
             var users = _context.Users.ToList();
             return View(users); 
         }
 
-        // GET: /Users/Login
-        // This displays the beautiful Login screen
+        [AllowAnonymous]
         [HttpGet]
         public IActionResult Login()
         {
+            if (User.Identity.IsAuthenticated) return RedirectToAction("Index", "Home");
             return View();
         }
 
-        // POST: /Users/Login
-        // This handles the login submission
+        [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string email, string password)
         {
-            // Check the database for a matching user
             var user = _context.Users.FirstOrDefault(u => u.Email == email && u.PasswordHash == password);
             
             if (user != null) 
             {
-                // Create the secure authentication cookie
                 var claims = new List<Claim> {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Name, user.FullName),
@@ -64,48 +54,74 @@ namespace PhotocopySystem.Controllers
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
                 
-                // If they are Admin/Operator, take them to User Management. Otherwise, to Home Page.
-                if (user.Role == "Admin" || user.Role == "Operator")
-                    return RedirectToAction(nameof(Index));
-                else
-                    return RedirectToAction("Index", "Home");
+                // Bug 7 fix: Role-based redirect after login
+                return user.Role switch
+                {
+                    "Teacher" => RedirectToAction("Index", "Notes"),
+                    "Admin"   => RedirectToAction("Index", "Users"),
+                    _         => RedirectToAction("Index", "Home")  // Student
+                };
             }
 
-            // If login fails, show error message
-            ModelState.AddModelError("", "Invalid Email or Password. Please try again.");
+            ModelState.AddModelError("", "Invalid Email or Password.");
             return View();
         }
 
-        // GET: /Users/Create
-        // This action just returns the empty HTML form for the user to fill out.
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult Signup()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Signup(User userModel)
+        {
+            if (ModelState.IsValid)
+            {
+                userModel.Role = "Student"; // Default role for self-signup
+                _context.Users.Add(userModel);
+                _context.SaveChanges();
+                return RedirectToAction(nameof(Login));
+            }
+            return View(userModel);
+        }
+
+        // Feature 3: Admin can create users with specific roles
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult Create()
         {
+            ViewBag.Roles = new List<string> { "Admin", "Teacher", "Student" };
             return View();
         }
 
-        // POST: /Users/Create
-        // This action receives the submitted form data from the user.
+        [Authorize(Roles = "Admin")]
         [HttpPost]
-        [ValidateAntiForgeryToken] // Security measure to prevent Cross-Site Request Forgery (CSRF)
+        [ValidateAntiForgeryToken]
         public IActionResult Create(User userModel)
         {
-            // 2. ModelState.IsValid checks if all the [Required] and [EmailAddress] rules in our Model are met.
-            if (ModelState.IsValid)
+            if (_context.Users.Any(u => u.Email == userModel.Email))
             {
-                // Save to the actual database!
-                _context.Users.Add(userModel);
-                _context.SaveChanges();
-
-                // 3. If successful, redirect back to the Login page so they can sign in.
-                return RedirectToAction(nameof(Login));
+                ModelState.AddModelError("Email", "Email already registered.");
+                ViewBag.Roles = new List<string> { "Admin", "Teacher", "Student" };
+                return View(userModel);
             }
 
-            // 4. If there were errors (like missing name), return the same view so they can fix it.
+            if (ModelState.IsValid)
+            {
+                _context.Users.Add(userModel);
+                _context.SaveChanges();
+                TempData["Success"] = $"User '{userModel.FullName}' created as {userModel.Role}.";
+                return RedirectToAction(nameof(Index));
+            }
+            ViewBag.Roles = new List<string> { "Admin", "Teacher", "Student" };
             return View(userModel);
         }
         
-        // GET: /Users/Logout
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

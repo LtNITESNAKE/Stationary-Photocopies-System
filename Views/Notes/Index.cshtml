@@ -1,0 +1,52 @@
+@model IEnumerable<PhotocopySystem.Models.Note>
+
+@{
+    ViewData["Title"] = "University Notes & Assignments";
+}
+
+<div class="container mt-4">
+    <div class="row mb-3">
+        <div class="col">
+            <h2 class="text-secondary"><i class="bi bi-file-earmark-text me-2"></i>Library of Notes</h2>
+            <p class="text-muted small">Select a note to see details. You can request copies from the Print Queue.</p>
+        </div>
+        @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+        {
+            <div class="col text-end">
+                <a asp-action="Create" class="btn btn-success">
+                    <i class="bi bi-cloud-arrow-up me-1"></i>Upload New Note
+                </a>
+            </div>
+        }
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-primary bg-opacity-10 text-primary">@item.Subject?.Name</span>
+                            <span class="text-muted small">v@item.Version</span>
+                        </div>
+                        <h5 class="card-title fw-bold">@item.Title</h5>
+                        <p class="card-text text-muted small">Uploaded by: <strong>@item.Teacher?.FullName</strong></p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pb-3">
+                        <a asp-controller="PrintJobs" asp-action="Create" asp-route-noteId="@item.Id" class="btn btn-sm btn-outline-primary w-100">
+                            Request Photocopies
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (!Model.Any())
+        {
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-inbox text-muted display-1"></i>
+                <p class="text-muted mt-3">No notes have been uploaded yet.</p>
+            </div>
+        }
+    </div>
+</div>

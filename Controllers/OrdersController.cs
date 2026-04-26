@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PhotocopySystem.Data;
 using PhotocopySystem.Models;
+using System;
 using System.Linq;
+using System.Security.Claims;
 
 namespace PhotocopySystem.Controllers
 {
@@ -15,36 +17,78 @@ namespace PhotocopySystem.Controllers
             _context = context;
         }
 
-        // TODO for Malaika: You are managing Student Stationery Purchases!
-        // While students are printing notes, they can also buy pens, notebooks, etc.
-
-        // 1. Index() - GET (COMPLETED EXAMPLE)
-        // What it does: Displays a list of all Orders. Uses .Include() to show the Student's name.
         public IActionResult Index()
         {
-            // TODO: Once you finish the Order Model, uncomment the .Include() line!
-            var orders = _context.Orders
-                .Include(o => o.User) // The Student
-                .ToList();
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var isAdmin = User.IsInRole("Admin");
+
+            var query = _context.Orders.Include(o => o.User).AsQueryable();
+
+            if (!isAdmin)
+            {
+                query = query.Where(o => o.UserId == userId);
+            }
+
+            var orders = query.OrderByDescending(o => o.OrderDate).ToList();
             return View(orders);
         }
 
-        // 2. Details(int id) - GET
-        // TODO: Fetch the order and .Include(o => o.OrderItems).ThenInclude(i => i.Product) to show what they bought.
-        public IActionResult Details(int id)
+        // 2. Buy Product (POST)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(int productId, int quantity)
         {
-            var order = _context.Orders
-                .Include(o => o.User)
-                .Include(o => o.OrderItems)
-                    .ThenInclude(i => i.Product)
-                .FirstOrDefault(o => o.Id == id);
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var product = _context.Products.Find(productId);
+            var stock = _context.InventoryStocks.FirstOrDefault(s => s.ProductId == productId);
 
-            if (order == null)
+            if (product == null || stock == null || stock.QuantityAvailable < quantity)
             {
-                return NotFound();
+                TempData["Error"] = "Insufficient stock or invalid product.";
+                return RedirectToAction("Index", "InventoryStocks");
             }
 
-            return View(order);
+            var strategy = _context.Database.CreateExecutionStrategy();
+            strategy.Execute(() =>
+            {
+                using (var transaction = _context.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        // Create the Order
+                        var order = new Order
+                        {
+                            UserId = userId,
+                            OrderDate = DateTime.Now,
+                            TotalAmount = product.Price * quantity
+                        };
+                        _context.Orders.Add(order);
+                        _context.SaveChanges();
+
+                        // Create the Order Item
+                        var item = new OrderItem
+                        {
+                            OrderId = order.Id,
+                            ProductId = productId,
+                            Quantity = quantity,
+                            UnitPrice = product.Price
+                        };
+                        _context.OrderItems.Add(item);
+                        _context.SaveChanges(); 
+                        // NOTE: The database trigger 'trg_AutoDeductStock' will automatically update the stock now!
+
+                        transaction.Commit();
+                        TempData["Success"] = $"Successfully purchased {quantity} {product.Name}(s)!";
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        TempData["Error"] = "Purchase failed: " + ex.Message;
+                    }
+                }
+            });
+
+            return RedirectToAction("Index");
         }
     }
 }

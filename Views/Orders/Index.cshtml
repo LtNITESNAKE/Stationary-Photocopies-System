@@ -1,45 +1,51 @@
 @model IEnumerable<PhotocopySystem.Models.Order>
 
 @{
-    ViewData["Title"] = "All Orders";
+    ViewData["Title"] = "Order History";
 }
 
-<div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold" style="color: #2c3e50;">
-            <i class="bi bi-receipt me-2"></i>Customer Orders
-        </h2>
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="fw-bold text-secondary"><i class="bi bi-bag-check me-2"></i>@(User.IsInRole("Admin") ? "All Stationery Orders" : "Your Orders")</h2>
+            <p class="text-muted">@(User.IsInRole("Admin") ? "View all student stationery purchases." : "View your recent stationery purchases.")</p>
+        </div>
     </div>
 
-    <div class="card shadow-lg border-0" style="border-radius: 15px; overflow: hidden;">
+    <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover mb-0 align-middle">
-                    <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
                         <tr>
-                            <th class="py-3 px-4">ID</th>
-                            <th class="py-3 px-4">Full Name</th>
-                            <th class="py-3 px-4">Order Date</th>
-                            <th class="py-3 px-4">Total Amount</th>
-                            <th class="py-3 px-4">Status</th>
-                            <th class="py-3 px-4 text-center">Actions</th>
+                            <th class="ps-4 py-3">Order ID</th>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <th class="py-3">Student Name</th>
+                            }
+                            <th class="py-3">Date</th>
+                            <th class="py-3">Total Amount</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in Model)
                         {
+                            <tr class="align-middle">
+                                <td class="ps-4 fw-bold">#ORD-@item.Id</td>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <td>@item.User?.FullName</td>
+                                }
+                                <td>@item.OrderDate.ToString("dd MMM yyyy, hh:mm tt")</td>
+                                <td class="fw-bold text-success">Rs. @item.TotalAmount.ToString("F2")</td>
+                            </tr>
+                        }
+                        @if (!Model.Any())
+                        {
                             <tr>
-                                <td class="px-4 fw-bold text-muted">#@item.Id</td>
-                                <td class="px-4 fw-semibold text-dark">@item.User?.FullName</td>
-                                <td class="px-4 text-muted">@item.OrderDate.ToString("yyyy-MM-dd")</td>
-                                <td class="px-4 text-muted">@item.TotalAmount</td>
-                                <td class="px-4">
-                                    <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">@item.Status</span>
-                                </td>
-                                <td class="px-4 text-center">
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary rounded-circle">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
+                                <td colspan="3" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox display-4 d-block mb-3"></i>
+                                    No orders found yet. Visit the shop to buy stationery!
                                 </td>
                             </tr>
                         }
@@ -49,22 +55,3 @@
         </div>
     </div>
 </div>
-
-<style>
-    .table-hover tbody tr:hover {
-        background-color: #f8f9fa;
-        transform: translateY(-1px);
-        transition: all 0.2s ease;
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-    }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
-        }
-</style>

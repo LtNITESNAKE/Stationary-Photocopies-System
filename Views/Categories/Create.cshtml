@@ -4,13 +4,33 @@
     ViewData["Title"] = "Create Category";
 }
 
-<!-- TODO for Misbah: -->
-<!-- 1. Open Views/Users/Create.cshtml and copy the beautiful card layout. -->
-<!-- 2. Update the form to post to the Categories Controller. -->
-<!-- 3. Add input fields for Name and Description. -->
-
 <div class="container mt-5">
-    <h2><i class="bi bi-plus-circle"></i> Create Category</h2>
-    <hr />
-    <p class="text-muted">Misbah, build your form here!</p>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0 p-4">
+                <h3 class="fw-bold mb-4 text-primary"><i class="bi bi-tag-plus me-2"></i> Add New Category</h3>
+                
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    
+                    <div class="form-floating mb-4">
+                        <input asp-for="Name" class="form-control" placeholder="Category Name" />
+                        <label asp-for="Name">Category Name (e.g. Pens, Binding)</label>
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+                            Create Category
+                        </button>
+                        <a asp-action="Index" class="btn btn-link text-muted">Cancel and go back</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

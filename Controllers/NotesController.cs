@@ -2,10 +2,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PhotocopySystem.Data;
 using PhotocopySystem.Models;
+using System;
 using System.Linq;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PhotocopySystem.Controllers
 {
+    [Authorize]
     public class NotesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -15,11 +20,7 @@ namespace PhotocopySystem.Controllers
             _context = context;
         }
 
-        // TODO for Teacher Role Developer:
-        // Teachers use this controller to upload their notes and assignments.
-
-        // 1. Index() - GET (COMPLETED EXAMPLE)
-        // What it does: Shows all uploaded notes. Uses .Include() to fetch related Teacher and Subject names.
+        // 1. Library (Live DB Fetch) — any authenticated user can browse
         public IActionResult Index()
         {
             var notes = _context.Notes
@@ -29,10 +30,29 @@ namespace PhotocopySystem.Controllers
             return View(notes);
         }
 
-        // 2. Create() - GET
-        // TODO: Show the upload form. Pass a ViewBag.Subjects so the teacher can select what subject the note is for.
+        // 2. Upload Note (GET) — Teachers and Admins only
+        [Authorize(Roles = "Teacher,Admin")]
+        public IActionResult Create()
+        {
+            ViewBag.Subjects = new SelectList(_context.Subjects, "Id", "Name");
+            return View();
+        }
 
-        // 3. Create(Note note) - POST
-        // TODO: Save the uploaded Note to the database.
+        // 3. Upload Note (POST) — Teachers and Admins only
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Teacher,Admin")]
+        public IActionResult Create(Note note)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            
+            note.TeacherId = userId;
+            note.UploadedAt = DateTime.Now;
+            
+            _context.Notes.Add(note);
+            _context.SaveChanges();
+            
+            return RedirectToAction("Index");
+        }
     }
 }

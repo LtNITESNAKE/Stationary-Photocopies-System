@@ -1,0 +1,106 @@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="fw-bold text-dark mb-1">Welcome Back, @User.Identity.Name!</h2>
+            <p class="text-muted">Here is what's happening at the Photocopy & Stationery Shop today.</p>
+        </div>
+    </div>
+
+    <!-- Quick Stats Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-primary text-white h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-white-50 text-uppercase fw-bold small">Active Print Jobs</h6>
+                            <h2 class="fw-bold mb-0">@ViewBag.JobCount</h2>
+                        </div>
+                        <div class="fs-1 opacity-50">
+                            <i class="bi bi-printer"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-success text-white h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-white-50 text-uppercase fw-bold small">Total Shop Orders</h6>
+                            <h2 class="fw-bold mb-0">@ViewBag.OrderCount</h2>
+                        </div>
+                        <div class="fs-1 opacity-50">
+                            <i class="bi bi-cart-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-dark text-white h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-white-50 text-uppercase fw-bold small">Total Members</h6>
+                            <h2 class="fw-bold mb-0">@ViewBag.UserCount</h2>
+                        </div>
+                        <div class="fs-1 opacity-50">
+                            <i class="bi bi-people"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Main Service Cards -->
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title fw-bold mb-0">Quick Services</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="p-4 border rounded-4 bg-light text-center">
+                                <i class="bi bi-file-earmark-pdf fs-1 text-primary d-block mb-2"></i>
+                                <h5 class="fw-bold">Notes Library</h5>
+                                <p class="small text-muted">Browse and print teacher assignments.</p>
+                                <a asp-controller="Notes" asp-action="Index" class="btn btn-primary rounded-pill px-4">Open Library</a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-4 border rounded-4 bg-light text-center">
+                                <i class="bi bi-pen fs-1 text-success d-block mb-2"></i>
+                                <h5 class="fw-bold">Stationery Shop</h5>
+                                <p class="small text-muted">Buy pens, paper, and notebooks.</p>
+                                <a asp-controller="InventoryStocks" asp-action="Index" class="btn btn-success rounded-pill px-4">Go to Shop</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Role Info -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-warning bg-opacity-10 h-100">
+                <div class="card-body p-4 text-center">
+                    <i class="bi bi-shield-check fs-1 text-warning d-block mb-3"></i>
+                    <h4 class="fw-bold">System Status</h4>
+
+                    <div class="alert alert-warning border-0 small py-2">
+                        PDC Logic: <strong>3 Printers Active</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
