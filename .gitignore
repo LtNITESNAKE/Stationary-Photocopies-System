@@ -498,3 +498,7 @@ appsettings.*.json
 
 # Ignore publish output folder
 publish_output/
+
+# Ignore update zip and final publish output
+update.zip
+publish_final/
