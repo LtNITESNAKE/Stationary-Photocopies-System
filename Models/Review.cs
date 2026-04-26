@@ -46,15 +46,9 @@ namespace PhotocopySystem.Models
         [ForeignKey("ProductId")]
         public virtual Product Product { get; set; }
 
-        // Fazil's additions below
-        [Required]
-        [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5.")]
+        // FIX: Added the missing properties!
         public int Rating { get; set; }
-
-        [Required]
-        [StringLength(500, ErrorMessage = "Comment cannot exceed 500 characters.")]
         public string Comment { get; set; }
-
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

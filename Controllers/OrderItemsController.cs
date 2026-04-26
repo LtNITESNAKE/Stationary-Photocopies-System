@@ -34,20 +34,36 @@ namespace PhotocopySystem.Controllers
         // TODO: Find the Student's active 'Cart' Order. Create an OrderItem linking the Product to the Order.
         public IActionResult AddToCart(int productId, int quantity)
         {
-            var cartOrder = _context.Orders.FirstOrDefault(o => o.Status == "Cart");
+            // FIX: Get current logged-in user
+            var email = User.Identity.Name;
+            var user = _context.Users.FirstOrDefault(u => u.Email == email);
+            if (user == null) return RedirectToAction("Login", "Users");
+
+            // FIX: Find the Student's active Cart, or CREATE ONE if they don't have it!
+            var cartOrder = _context.Orders.FirstOrDefault(o => o.Status == "Cart" && o.UserId == user.Id);
+            if (cartOrder == null)
+            {
+                cartOrder = new Order { UserId = user.Id, Status = "Cart", TotalAmount = 0 };
+                _context.Orders.Add(cartOrder);
+                _context.SaveChanges(); // Save to generate the Order ID
+            }
+
             var product = _context.Products.Find(productId);
-            if (cartOrder != null)
+            if (product != null)
             {
                 var newItem = new OrderItem
                 {
                     OrderId = cartOrder.Id,
                     ProductId = productId,
                     Quantity = quantity,
-                   // UnitPrice = product.Price
-
+                    UnitPrice = product.Price // FIX: Uncommented Price!
                 };
 
                 _context.OrderItems.Add(newItem);
+                
+                // FIX: Update the parent Cart total!
+                cartOrder.TotalAmount += (product.Price * quantity);
+                
                 _context.SaveChanges();
             }
 
@@ -58,9 +74,15 @@ namespace PhotocopySystem.Controllers
         // TODO: Delete the OrderItem from the database.
         public IActionResult RemoveFromCart(int id)
         {
-            var item = _context.OrderItems.Find(id);
+            // FIX: Include the parent Order so we can deduct the total!
+            var item = _context.OrderItems.Include(i => i.Order).FirstOrDefault(i => i.Id == id);
             if (item != null)
             {
+                if (item.Order != null)
+                {
+                    item.Order.TotalAmount -= (item.UnitPrice * item.Quantity);
+                }
+                
                 _context.OrderItems.Remove(item);
                 _context.SaveChanges();
             }

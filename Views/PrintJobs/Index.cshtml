@@ -4,12 +4,75 @@
     ViewData["Title"] = "Print Queue";
 }
 
-<!-- TODO for Maryam (Print Queue Dashboard): -->
-<!-- 1. Use the Users/Index.cshtml template. -->
-<!-- 2. Display Student.FullName, Note.Title, Copies, Status, and EstimatedPickupTime. -->
-
 <div class="container mt-5">
-    <h2><i class="bi bi-printer"></i> Background Print Queue</h2>
-    <hr />
-    <p class="text-muted">Maryam, build your queue table here!</p>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-printer"></i> Background Print Queue</h2>
+        <a asp-action="Create" class="btn btn-primary rounded-pill">
+            <i class="bi bi-plus-circle me-1"></i> New Print Job
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Student</th>
+                            <th>Document / Note</th>
+                            <th>Copies</th>
+                            <th>Status</th>
+                            <th>Pickup Time</th>
+                            <th class="text-center pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    <strong>@item.Student?.FullName</strong>
+                                </td>
+                                <td>
+                                    @if (item.Note != null)
+                                    {
+                                        <span class="badge bg-info text-dark">Note: @item.Note.Title</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">@item.DocumentName</span>
+                                    }
+                                </td>
+                                <td>@item.Copies</td>
+                                <td>
+                                    @{
+                                        var badgeClass = item.Status switch
+                                        {
+                                            "Queued" => "bg-warning text-dark",
+                                            "Printing" => "bg-primary",
+                                            "Completed" => "bg-success",
+                                            "Cancelled" => "bg-danger",
+                                            _ => "bg-secondary"
+                                        };
+                                    }
+                                    <span class="badge @badgeClass">@item.Status</span>
+                                </td>
+                                <td>@item.EstimatedPickupTime.ToString("hh:mm tt")</td>
+                                <td class="text-center pe-4">
+                                    @if (item.Status == "Queued" || item.Status == "Printing")
+                                    {
+                                        <form asp-action="Cancel" asp-route-id="@item.Id" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill" onclick="return confirm('Are you sure?')">
+                                                <i class="bi bi-x-circle"></i> Cancel
+                                            </button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
