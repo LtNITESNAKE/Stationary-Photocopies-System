@@ -71,16 +71,23 @@ The **Photocopy Portal** is an advanced, role-based university stationery and pr
    dotnet run
    ```
 
+
+
 ---
 
-## 👥 Default Seed Accounts
-Use the following credentials to test the role-based features locally:
+## 👥 Development Team
 
-| Role | Email | Password |
-| :--- | :--- | :--- |
-| **Admin** | `admin@system.com` | `Admin123` |
-| **Teacher** | `ahmed@univ.com` | `Teacher123` |
-| **Student** | `student1@univ.com` | `Student123` |
+This project was built collaboratively by our 9-member team:
+
+- **Mujtaba** – Lead Architect & Full Stack Integration
+- **Malaika** – Database Specialist (Schema & Triggers)
+- **Misbah** – Inventory & Business Logic
+- **Maryam** – PDC Specialist (Concurrency & Queuing)
+- **Noor** – PDC Specialist (Semaphore & Threading)
+- **Hadain** – Load Balancing & IIS Config
+- **Awais** – Proxy Networking & Deployment
+- **Fazil** – UI Specialist & Frontend Views
+- **Muskan** – UI Specialist & SignalR Integration
 
 ---
 *Developed for University Semester 6 - Parallel and Distributed Computing (PDC).*

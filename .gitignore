@@ -495,3 +495,6 @@ publish.zip
 # Ignore appsettings containing sensitive connection strings
 appsettings.json
 appsettings.*.json
+
+# Ignore publish output folder
+publish_output/
