@@ -29,7 +29,7 @@
                                     foreach (var note in (IEnumerable<PhotocopySystem.Models.Note>)ViewBag.Notes)
                                     {
                                         <option value="@note.Id">
-                                            [@note.Subject?.Name] @note.Title (By @note.Teacher?.FullName) - v@note.Version
+                                            [@note.Subject?.Name] @note.Title (By @note.Teacher?.FullName) - v@(note.Version)
                                         </option>
                                     }
                                 }

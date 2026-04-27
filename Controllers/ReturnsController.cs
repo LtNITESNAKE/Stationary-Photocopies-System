@@ -24,8 +24,14 @@ namespace PhotocopySystem.Controllers
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            // Fetch products this user has bought
-            var boughtItems = _context.OrderItems
+            // Fetch products this user has bought (minus what they already returned)
+            var returnSums = _context.ReturnRecords
+                .Where(r => r.UserId == userId)
+                .GroupBy(r => r.ProductId)
+                .Select(g => new { ProductId = g.Key, ReturnedQty = g.Sum(r => r.Quantity) })
+                .ToList();
+
+            var boughtItemsRaw = _context.OrderItems
                 .Include(oi => oi.Order)
                 .Include(oi => oi.Product)
                 .Where(oi => oi.Order.UserId == userId)
@@ -34,10 +40,17 @@ namespace PhotocopySystem.Controllers
                 {
                     ProductId = g.Key,
                     ProductName = g.First().Product.Name,
-                    AvailableQuantity = g.Sum(oi => oi.Quantity),
+                    TotalBought = g.Sum(oi => oi.Quantity),
                     Price = g.First().UnitPrice
                 })
                 .ToList();
+
+            var boughtItems = boughtItemsRaw.Select(b => new {
+                b.ProductId,
+                b.ProductName,
+                AvailableQuantity = b.TotalBought - (returnSums.FirstOrDefault(r => r.ProductId == b.ProductId)?.ReturnedQty ?? 0),
+                b.Price
+            }).Where(b => b.AvailableQuantity > 0).ToList();
 
             ViewBag.BoughtItems = boughtItems;
 
@@ -67,55 +80,66 @@ namespace PhotocopySystem.Controllers
                 return RedirectToAction("Index");
             }
 
-            // Check if user actually has this many items
+            // Check if user actually has this many items (bought minus already returned)
             var totalBought = _context.OrderItems
                 .Include(oi => oi.Order)
                 .Where(oi => oi.Order.UserId == userId && oi.ProductId == productId)
-                .Sum(oi => oi.Quantity);
+                .Sum(oi => (int?)oi.Quantity) ?? 0;
 
-            if (quantity <= 0 || quantity > totalBought)
+            var alreadyReturned = _context.ReturnRecords
+                .Where(r => r.UserId == userId && r.ProductId == productId)
+                .Sum(r => (int?)r.Quantity) ?? 0;
+
+            int availableToReturn = totalBought - alreadyReturned;
+
+            if (quantity <= 0 || quantity > availableToReturn)
             {
-                TempData["Error"] = "Invalid quantity to return.";
+                TempData["Error"] = $"Invalid quantity. You have {availableToReturn} items available to return.";
                 return RedirectToAction("Index");
             }
 
-            using (var transaction = _context.Database.BeginTransaction())
+            var strategy = _context.Database.CreateExecutionStrategy();
+
+            strategy.Execute(() =>
             {
-                try
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    decimal refundAmount = product.Price * quantity;
-
-                    // 1. Update Admin Stock
-                    stock.QuantityAvailable += quantity;
-
-                    // 2. Update Student Balance (Refund)
-                    student.Balance += refundAmount;
-
-                    // 3. Update Admin Balance (Deduct)
-                    admin.Balance -= refundAmount;
-
-                    // 4. Record the return in the new table
-                    var returnRecord = new ReturnRecord
+                    try
                     {
-                        UserId = userId,
-                        ProductId = productId,
-                        Quantity = quantity,
-                        RefundAmount = refundAmount,
-                        ReturnDate = DateTime.Now
-                    };
-                    _context.ReturnRecords.Add(returnRecord);
-                    
-                    _context.SaveChanges();
-                    transaction.Commit();
+                        decimal refundAmount = product.Price * quantity;
 
-                    TempData["Success"] = $"Successfully returned {quantity} {product.Name}(s). Rs. {refundAmount:F2} added to your balance.";
+                        // 1. Update Admin Stock
+                        stock.QuantityAvailable += quantity;
+
+                        // 2. Update Student Balance (Refund)
+                        student.Balance += refundAmount;
+
+                        // 3. Update Admin Balance (Deduct)
+                        admin.Balance -= refundAmount;
+
+                        // 4. Record the return in the new table
+                        var returnRecord = new ReturnRecord
+                        {
+                            UserId = userId,
+                            ProductId = productId,
+                            Quantity = quantity,
+                            RefundAmount = refundAmount,
+                            ReturnDate = DateTime.Now
+                        };
+                        _context.ReturnRecords.Add(returnRecord);
+                        
+                        _context.SaveChanges();
+                        transaction.Commit();
+
+                        TempData["Success"] = $"Successfully returned {quantity} {product.Name}(s). Rs. {refundAmount:F2} added to your balance.";
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        TempData["Error"] = "Return failed: " + ex.Message;
+                    }
                 }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-                    TempData["Error"] = "Return failed: " + ex.Message;
-                }
-            }
+            });
 
             return RedirectToAction("Index");
         }

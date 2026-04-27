@@ -28,18 +28,6 @@ namespace PhotocopySystem.Controllers
                 .Include(n => n.Subject)
                 .ToList();
 
-            // Task 3: For students, dynamically check if note is still locked based on ReleaseTime
-            if (User.IsInRole("Student"))
-            {
-                foreach (var note in notes)
-                {
-                    if (note.IsLocked && note.ReleaseTime.HasValue && DateTime.Now >= note.ReleaseTime.Value)
-                    {
-                        note.IsLocked = false; // Temporarily unlock in memory for the view
-                    }
-                }
-            }
-
             return View(notes);
         }
 
@@ -70,6 +58,30 @@ namespace PhotocopySystem.Controllers
 
             _context.Notes.Add(note);
             _context.SaveChanges();
+            
+            return RedirectToAction("Index");
+        }
+
+        // 4. Delete Note — Admin or the Teacher who uploaded it
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Teacher,Admin")]
+        public IActionResult Delete(int id)
+        {
+            var note = _context.Notes.Find(id);
+            if (note == null) return NotFound();
+
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            
+            // Security check: only Admin or the actual Teacher who uploaded can delete
+            if (!User.IsInRole("Admin") && note.TeacherId != userId)
+            {
+                return Forbid();
+            }
+
+            _context.Notes.Remove(note);
+            _context.SaveChanges();
+            TempData["Success"] = "Note deleted successfully.";
             
             return RedirectToAction("Index");
         }

@@ -1,3 +1,12 @@
+@inject PhotocopySystem.Data.ApplicationDbContext _db
+@{
+    decimal liveBalance = 0;
+    if (User.Identity.IsAuthenticated)
+    {
+        var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
+        liveBalance = _db.Users.Where(u => u.Id == userId).Select(u => u.Balance).FirstOrDefault();
+    }
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -72,7 +81,7 @@
 
                 <div class="p-4 mt-auto">
                     <hr class="border-secondary">
-                    <div class="small mb-1 text-muted">Balance: <span class="text-success fw-bold">Rs. @User.Claims.FirstOrDefault(c => c.Type == "Balance")?.Value</span></div>
+                    <div class="small mb-1 text-muted">Balance: <span class="text-success fw-bold">Rs. @liveBalance.ToString("F2")</span></div>
                     <div class="small mb-1 text-muted text-truncate">User: <strong>@User.Identity.Name</strong></div>
                     <a asp-controller="Users" asp-action="Logout" class="btn btn-sm btn-danger w-100 mt-3 rounded-pill shadow-sm">Logout</a>
                 </div>

@@ -55,30 +55,44 @@ namespace PhotocopySystem.Controllers
                 {
                     try
                     {
+                        var user = _context.Users.Find(userId);
+                        var admin = _context.Users.FirstOrDefault(u => u.Role == "Admin");
+                        decimal totalAmount = product.Price * quantity;
+
+                        if (user == null || admin == null) throw new Exception("Users not found.");
+
+                        // Check if student has enough balance
+                        if (user.Balance < totalAmount)
+                        {
+                            throw new Exception($"Insufficient balance. You need Rs. {totalAmount:F2} but only have Rs. {user.Balance:F2}.");
+                        }
+
                         // Create the Order
                         var order = new Order
                         {
                             UserId = userId,
                             OrderDate = DateTime.Now,
-                            TotalAmount = product.Price * quantity
+                            TotalAmount = totalAmount
                         };
                         _context.Orders.Add(order);
-                        _context.SaveChanges();
-
-                        // Create the Order Item
+                        
+                        // Create the Order Item (Linked via object, not ID)
                         var item = new OrderItem
                         {
-                            OrderId = order.Id,
+                            Order = order,
                             ProductId = productId,
                             Quantity = quantity,
                             UnitPrice = product.Price
                         };
                         _context.OrderItems.Add(item);
-                        _context.SaveChanges(); 
-                        // NOTE: The database trigger 'trg_AutoDeductStock' will automatically update the stock now!
 
+                        // Update Balances
+                        user.Balance -= totalAmount;
+                        admin.Balance += totalAmount;
+
+                        _context.SaveChanges(); 
                         transaction.Commit();
-                        TempData["Success"] = $"Successfully purchased {quantity} {product.Name}(s)!";
+                        TempData["Success"] = $"Successfully purchased {quantity} {product.Name}(s)! Rs. {totalAmount:F2} deducted from balance.";
                     }
                     catch (Exception ex)
                     {
