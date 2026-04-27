@@ -31,12 +31,27 @@
                             <span class="text-muted small">v@item.Version</span>
                         </div>
                         <h5 class="card-title fw-bold">@item.Title</h5>
-                        <p class="card-text text-muted small">Uploaded by: <strong>@item.Teacher?.FullName</strong></p>
+                        <p class="card-text text-muted small mb-1">Uploaded by: <strong>@item.Teacher?.FullName</strong></p>
+                        @if (item.IsLocked)
+                        {
+                            <div class="text-danger small mt-2">
+                                <i class="bi bi-lock-fill me-1"></i> Locked until: @item.ReleaseTime?.ToString("dd MMM, hh:mm tt")
+                            </div>
+                        }
                     </div>
                     <div class="card-footer bg-transparent border-0 pb-3">
-                        <a asp-controller="PrintJobs" asp-action="Create" asp-route-noteId="@item.Id" class="btn btn-sm btn-outline-primary w-100">
-                            Request Photocopies
-                        </a>
+                        @if (item.IsLocked && User.IsInRole("Student"))
+                        {
+                            <button class="btn btn-sm btn-secondary w-100" disabled>
+                                <i class="bi bi-lock me-1"></i> Locked
+                            </button>
+                        }
+                        else
+                        {
+                            <a asp-controller="PrintJobs" asp-action="Create" asp-route-noteId="@item.Id" class="btn btn-sm btn-outline-primary w-100">
+                                Request Photocopies
+                            </a>
+                        }
                     </div>
                 </div>
             </div>

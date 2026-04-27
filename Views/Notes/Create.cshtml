@@ -35,6 +35,12 @@
                             <span asp-validation-for="Version" class="text-danger small"></span>
                         </div>
 
+                        <div class="mb-3">
+                            <label asp-for="ReleaseTime" class="form-label fw-bold">Release Time (Optional Lock)</label>
+                            <input asp-for="ReleaseTime" type="datetime-local" class="form-control" />
+                            <div class="text-muted small">If set, students cannot access these notes until this time.</div>
+                        </div>
+
                         <div class="d-grid gap-2 mt-4">
                             <button type="submit" class="btn btn-success py-2 fw-bold">Upload & Publish</button>
                             <a asp-action="Index" class="btn btn-link text-muted small">Cancel</a>

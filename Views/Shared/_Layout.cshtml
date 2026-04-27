@@ -41,6 +41,9 @@
                         <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Orders" ? "active" : "")">
                             <a asp-controller="Orders" asp-action="Index"><i class="bi bi-bag-check me-2"></i>Recent Orders</a>
                         </li>
+                        <li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Returns" ? "active" : "")">
+                            <a asp-controller="Returns" asp-action="Index"><i class="bi bi-arrow-return-left me-2"></i>Return Items</a>
+                        </li>
                     }
 
                     @if (User.IsInRole("Admin"))
@@ -69,8 +72,8 @@
 
                 <div class="p-4 mt-auto">
                     <hr class="border-secondary">
-                    <div class="small mb-1 text-muted">Signed in as:</div>
-                    <div class="fw-bold small text-truncate text-white">@User.Identity.Name</div>
+                    <div class="small mb-1 text-muted">Balance: <span class="text-success fw-bold">Rs. @User.Claims.FirstOrDefault(c => c.Type == "Balance")?.Value</span></div>
+                    <div class="small mb-1 text-muted text-truncate">User: <strong>@User.Identity.Name</strong></div>
                     <a asp-controller="Users" asp-action="Logout" class="btn btn-sm btn-danger w-100 mt-3 rounded-pill shadow-sm">Logout</a>
                 </div>
             </nav>
@@ -79,6 +82,9 @@
             <div id="content">
                 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom mb-4 shadow-sm">
                     <div class="container-fluid">
+                        <button type="button" id="sidebarCollapse" class="btn btn-primary d-md-none me-3">
+                            <i class="bi bi-list"></i>
+                        </button>
                         <span class="navbar-text fw-bold text-dark fs-5">
                              @ViewData["Title"]
                         </span>
@@ -105,6 +111,13 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').toggleClass('active');
+            });
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -19,6 +19,7 @@ namespace PhotocopySystem.Data
         public DbSet<PrintJob> PrintJobs { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<ReturnRecord> ReturnRecords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

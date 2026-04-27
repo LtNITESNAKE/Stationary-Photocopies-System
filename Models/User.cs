@@ -22,5 +22,6 @@ namespace PhotocopySystem.Models
         public string Role { get; set; } // Admin, Teacher, Student
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public decimal Balance { get; set; } = 0.00m;
     }
 }

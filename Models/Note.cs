@@ -29,5 +29,7 @@ namespace PhotocopySystem.Models
         public virtual Subject? Subject { get; set; }
 
         public DateTime UploadedAt { get; set; } = DateTime.Now;
+        public DateTime? ReleaseTime { get; set; }
+        public bool IsLocked { get; set; } = false;
     }
 }

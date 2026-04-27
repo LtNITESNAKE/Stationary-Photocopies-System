@@ -242,5 +242,20 @@ namespace PhotocopySystem.Controllers
             // Recursive: keep processing if more jobs are queued
             await ProcessNextQueuedJobAsync();
         }
+        // 6. Delete - POST (Task 2)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public IActionResult Delete(int id)
+        {
+            var job = _context.PrintJobs.Find(id);
+            if (job != null)
+            {
+                _context.PrintJobs.Remove(job);
+                _context.SaveChanges();
+                TempData["Success"] = "Print request deleted successfully.";
+            }
+            return RedirectToAction("Index");
+        }
     }
 }

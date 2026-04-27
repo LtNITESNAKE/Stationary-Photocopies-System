@@ -41,6 +41,16 @@ namespace PhotocopySystem.Controllers
             {
                 _context.Add(product);
                 await _context.SaveChangesAsync();
+
+                // Issue 1 fix: Add to InventoryStocks so it shows in the shop
+                var stock = new InventoryStock
+                {
+                    ProductId = product.Id,
+                    QuantityAvailable = 0
+                };
+                _context.InventoryStocks.Add(stock);
+                await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
             ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);

@@ -1,0 +1,146 @@
+@model IEnumerable<PhotocopySystem.Models.ReturnRecord>
+@{
+    ViewData["Title"] = "Return Stationery";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-warning text-dark py-3">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-arrow-return-left me-2"></i>Return Unused Stationery</h4>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted small mb-4">Select items from your purchase history to return them to the shop for a refund.</p>
+
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success border-0 shadow-sm">@TempData["Success"]</div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger border-0 shadow-sm">@TempData["Error"]</div>
+                    }
+
+                    <form asp-action="ProcessReturn" method="post" id="returnForm">
+                        @Html.AntiForgeryToken()
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Select Item to Return</label>
+                            <select name="productId" id="productId" class="form-select" required onchange="updatePrice()">
+                                <option value="" data-price="0" data-max="0">-- Select Purchased Item --</option>
+                                @foreach (var item in ViewBag.BoughtItems)
+                                {
+                                    <option value="@item.ProductId" data-price="@item.Price" data-max="@item.AvailableQuantity">
+                                        @item.ProductName (Available: @item.AvailableQuantity)
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Quantity to Return</label>
+                            <div class="input-group">
+                                <button type="button" class="btn btn-outline-secondary" onclick="changeQty(-1)">-</button>
+                                <input type="number" name="quantity" id="quantity" class="form-control text-center" value="1" min="1" required onchange="updatePrice()" />
+                                <button type="button" class="btn btn-outline-secondary" onclick="changeQty(1)">+</button>
+                            </div>
+                            <div id="maxWarning" class="text-danger small mt-1 d-none">You cannot return more than you bought!</div>
+                        </div>
+
+                        <div class="card bg-light border-0 mb-4">
+                            <div class="card-body py-2 d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-muted">Estimated Refund:</span>
+                                <h4 class="mb-0 text-success fw-bold">Rs. <span id="displayPrice">0.00</span></h4>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-warning fw-bold py-2">
+                                <i class="bi bi-check-circle me-1"></i>Confirm Return
+                            </button>
+                            <a asp-controller="Orders" asp-action="Index" class="btn btn-link text-muted small">View Purchase History</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Return History -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light py-3">
+                    <h5 class="mb-0 fw-bold">Your Recent Returns</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr class="small text-uppercase">
+                                    <th class="ps-3">Item</th>
+                                    <th>Qty</th>
+                                    <th>Refund</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var r in Model)
+                                {
+                                    <tr>
+                                        <td class="ps-3">@r.Product?.Name</td>
+                                        <td>@r.Quantity</td>
+                                        <td class="text-success fw-bold">Rs. @r.RefundAmount.ToString("F2")</td>
+                                        <td class="small text-muted">@r.ReturnDate.ToString("dd MMM")</td>
+                                    </tr>
+                                }
+                                @if (!Model.Any())
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4 text-muted small">No returns recorded yet.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updatePrice() {
+            const select = document.getElementById('productId');
+            const qtyInput = document.getElementById('quantity');
+            const display = document.getElementById('displayPrice');
+            const warning = document.getElementById('maxWarning');
+
+            const selectedOption = select.options[select.selectedIndex];
+            const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+            const max = parseInt(selectedOption.getAttribute('data-max')) || 0;
+            let qty = parseInt(qtyInput.value) || 0;
+
+            if (qty > max) {
+                warning.classList.remove('d-none');
+                qtyInput.classList.add('is-invalid');
+            } else {
+                warning.classList.add('d-none');
+                qtyInput.classList.remove('is-invalid');
+            }
+
+            const total = price * qty;
+            display.innerText = total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function changeQty(delta) {
+            const qtyInput = document.getElementById('quantity');
+            let val = parseInt(qtyInput.value) || 1;
+            val += delta;
+            if (val < 1) val = 1;
+            qtyInput.value = val;
+            updatePrice();
+        }
+
+        // Initialize price on load
+        document.addEventListener('DOMContentLoaded', updatePrice);
+    </script>
+}

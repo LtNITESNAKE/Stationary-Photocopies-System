@@ -79,3 +79,23 @@ body {
     font-weight: bold;
     margin-top: 15px;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -250px;
+    }
+    #sidebar.active {
+        margin-left: 0;
+    }
+    #content {
+        width: 100%;
+    }
+    #sidebarCollapse span {
+        display: none;
+    }
+}
+
+#sidebar.active {
+    margin-left: 0;
+}

@@ -113,6 +113,14 @@
                                                 }
                                             </ul>
                                         </div>
+
+                                        <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-outline-danger px-3 ms-1 rounded-pill"
+                                                    onclick="return confirm('Permanently delete this request?')">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
                                     }
                                 </td>
                             </tr>

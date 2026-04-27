@@ -27,6 +27,19 @@ namespace PhotocopySystem.Controllers
                 .Include(n => n.Teacher)
                 .Include(n => n.Subject)
                 .ToList();
+
+            // Task 3: For students, dynamically check if note is still locked based on ReleaseTime
+            if (User.IsInRole("Student"))
+            {
+                foreach (var note in notes)
+                {
+                    if (note.IsLocked && note.ReleaseTime.HasValue && DateTime.Now >= note.ReleaseTime.Value)
+                    {
+                        note.IsLocked = false; // Temporarily unlock in memory for the view
+                    }
+                }
+            }
+
             return View(notes);
         }
 
@@ -49,6 +62,12 @@ namespace PhotocopySystem.Controllers
             note.TeacherId = userId;
             note.UploadedAt = DateTime.Now;
             
+            // Task 3: If release time is set, mark as initially locked
+            if (note.ReleaseTime.HasValue && note.ReleaseTime.Value > DateTime.Now)
+            {
+                note.IsLocked = true;
+            }
+
             _context.Notes.Add(note);
             _context.SaveChanges();
             
