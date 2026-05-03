@@ -60,7 +60,7 @@ namespace PhotocopySystem.Controllers
                 {
                     "Teacher" => RedirectToAction("Index", "Notes"),
                     "Admin"   => RedirectToAction("Index", "Users"),
-                    _         => RedirectToAction("Index", "Home")  // Student
+                    "Student"        => RedirectToAction("Index", "Home")  // Student
                 };
             }
 
@@ -80,11 +80,26 @@ namespace PhotocopySystem.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Signup(User userModel)
         {
+            // Remove Role from validation since we set it here
+            ModelState.Remove("Role");
+
+            if (_context.Users.Any(u => u.Email == userModel.Email))
+            {
+                ModelState.AddModelError("Email", "Email already registered.");
+                return View(userModel);
+            }
+
             if (ModelState.IsValid)
             {
-                userModel.Role = "Student"; // Default role for self-signup
+                // Note: userModel.Role will be populated if the user selected it in the view
+                if (string.IsNullOrEmpty(userModel.Role)) 
+                {
+                    userModel.Role = "Student"; 
+                }
+                
                 _context.Users.Add(userModel);
                 _context.SaveChanges();
+                TempData["Success"] = "Account created successfully! Please login.";
                 return RedirectToAction(nameof(Login));
             }
             return View(userModel);

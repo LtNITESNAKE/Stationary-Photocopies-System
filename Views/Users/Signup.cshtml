@@ -13,7 +13,7 @@
         </div>
         <div class="card shadow border-0">
             <div class="card-header bg-primary text-white text-center py-3">
-            <h4 class="mb-0 text-primary">Sign Up</h4>
+            <h4 class="mb-0 fw-bold">Sign Up</h4>
         </div>
         <div class="card-body p-4">
             <form asp-action="Signup" method="post">
@@ -35,6 +35,20 @@
                     <label asp-for="PasswordHash" class="form-label">Create Password</label>
                     <input asp-for="PasswordHash" type="password" class="form-control" placeholder="••••••••" />
                     <span asp-validation-for="PasswordHash" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Account Type</label>
+                    <div class="d-flex gap-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" asp-for="Role" value="Student" checked id="roleStudent">
+                            <label class="form-check-label" for="roleStudent">Student</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" asp-for="Role" value="Teacher" id="roleTeacher">
+                            <label class="form-check-label" for="roleTeacher">Teacher</label>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="d-grid gap-2 mt-4">

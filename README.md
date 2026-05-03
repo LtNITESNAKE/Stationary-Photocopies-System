@@ -54,7 +54,7 @@ The **Photocopy Portal** is an advanced, role-based university stationery and pr
 ### Setup Instructions
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/PhotocopySystem.git
+   git clone https://github.com/Mujtabanite/PhotocopySystem.git
    cd PhotocopySystem
    ```
 2. **Setup the Database**
