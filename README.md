@@ -75,19 +75,6 @@ The **Photocopy Portal** is an advanced, role-based university stationery and pr
 
 ---
 
-## 👥 Development Team
-
-This project was built collaboratively by our 9-member team:
-
-- **Mujtaba** – Lead Architect & Full Stack Integration
-- **Malaika** – Database Specialist (Schema & Triggers)
-- **Misbah** – Inventory & Business Logic
-- **Maryam** – PDC Specialist (Concurrency & Queuing)
-- **Noor** – PDC Specialist (Semaphore & Threading)
-- **Hadain** – Load Balancing & IIS Config
-- **Awais** – Proxy Networking & Deployment
-- **Fazil** – UI Specialist & Frontend Views
-- **Muskan** – UI Specialist & SignalR Integration
 
 ---
 *Developed for University Semester 6 - Parallel and Distributed Computing (PDC).*
